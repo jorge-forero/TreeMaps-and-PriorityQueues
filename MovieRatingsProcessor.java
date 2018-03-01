@@ -52,8 +52,37 @@ public class MovieRatingsProcessor {
         if (movieRatings == null || movieRatings.isEmpty()) {
             return moviesRemovedRatings;
         }
-        for (Iterator<Map.Entry<String, PriorityQueue<Integer>>> iterator = movieRatings.entrySet().iterator(); iterator.hasNext(); ) {
+        
+        Iterator<Map.Entry<String, PriorityQueue<Integer>>> iterator = movieRatings.entrySet().iterator();
+        Map.Entry<String, PriorityQueue<Integer>> entry;
+        
+        String movieName;
+        PriorityQueue<Integer> ratings;
+        int ratingsRemoved;
+        List<Integer> toRemove;
+        
+        while (iterator.hasNext()) {
+            entry = iterator.next();
+            movieName = entry.getKey();
+            ratings = entry.getValue();
+            
+            toRemove = new ArrayList<>();
+            for (int movieRating : ratings) {
+                if (movieRating < rating) {
+                    toRemove.add(movieRating);
+                }
+            }
 
+            ratings.removeAll(toRemove);
+            ratingsRemoved = toRemove.size();
+
+            if (ratings.size() == 0) {
+                iterator.remove();
+            }
+
+            if (ratingsRemoved > 0) {
+                moviesRemovedRatings.put(movieName, ratingsRemoved);
+            }
         }
 
         return moviesRemovedRatings;
